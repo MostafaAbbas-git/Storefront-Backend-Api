@@ -4,6 +4,7 @@ import Client from '../database';
 export type Order = {
   id?: string;
   status: string;
+  user_id: number;
 };
 
 export class OrderStore {
@@ -58,16 +59,16 @@ export class OrderStore {
   }
   async addProduct(
     quantity: number,
-    orderId: string,
-    productId: string
+    orderId: number,
+    productId: number
   ): Promise<Order> {
     try {
       const sql =
-        'INSERT INTO order_products (quantity, order_id, product_id) VALUES($1, $2, $3) RETURNING *';
+        'INSERT INTO order_products (quantities, product_ids) VALUES(ARRAY [$1], ARRAY [$2]) RETURNING *';
       // @ts-ignore
       const conn = await Client.connect();
 
-      const result = await conn.query(sql, [quantity, orderId, productId]);
+      const result = await conn.query(sql, [quantity, productId]);
 
       const order = result.rows[0];
 
@@ -81,14 +82,67 @@ export class OrderStore {
     }
   }
 
-  async delete(id: string): Promise<Order> {
+  async checkOrder(orderId: number): Promise<true | false> {
     try {
-      const sql = 'DELETE FROM orders WHERE id=($1)';
+      const sql = 'SELECT * FROM order_products WHERE id=($1)';
+      // @ts-ignore
+      const conn = await Client.connect();
+
+      const result = await conn.query(sql, [orderId]);
+      conn.release();
+
+      if (result.rows.length == 0) {
+        console.log(`Order with id ${orderId} does not exist.`);
+        return false;
+      } else {
+        return true;
+      }
+    } catch (err) {
+      throw new Error(
+        `Could not check for order with id ${orderId}. Error: ${err}`
+      );
+    }
+  }
+
+  async getProductsInOrder(orderId: number): Promise<object> {
+    try {
+      const sql =
+        ' SELECT id, quantities, product_ids FROM order_products WHERE id=($1)';
+      // @ts-ignore
+      const conn = await Client.connect();
+
+      const result = await conn.query(sql, [orderId]);
+
+      if (result.rows.length == 0) {
+        throw new Error(`Order with id ${orderId} has no products.`);
+      }
+
+      const order = result.rows[0];
+      console.log('fetched order: ');
+      console.log(order);
+
+      conn.release();
+
+      return order;
+    } catch (err) {
+      throw new Error(
+        `Could not get products in order with id ${orderId}. Error: ${err}`
+      );
+    }
+  }
+
+  async delete(id: number): Promise<Order> {
+    try {
+      const sql = 'DELETE FROM orders WHERE id=($1) RETURNING *';
       // @ts-ignore
       const conn = await Client.connect();
 
       const result = await conn.query(sql, [id]);
-
+      if (result.rows.length == 0) {
+        throw new Error(
+          `Could not delete order with id: ${id}. Does not exist`
+        );
+      }
       const order = result.rows[0];
 
       conn.release();

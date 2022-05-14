@@ -3,16 +3,16 @@ import jwt from 'jsonwebtoken';
 import { User, UserStore } from '../models/user';
 import {
   authMiddleware,
-  validateRequiredUserBodyFields,
+  validateUserInputsMiddleware,
 } from '../middleware/users.middleware';
 
 const userRoutes = (app: express.Application) => {
-  app.get('/users', [authMiddleware], index);
-  app.get('/users/:id', show);
+  app.get('/users', authMiddleware, index);
+  app.get('/users/:id', authMiddleware, show);
   app.post('/users', create);
-  app.post('/users/authenticate', validateRequiredUserBodyFields, authenticate);
+  app.post('/users/authenticate', validateUserInputsMiddleware, authenticate);
   app.patch('/users/:id', update);
-  app.delete('/users', destroy);
+  app.delete('/users/:id', destroy);
 };
 
 const store = new UserStore();
@@ -25,7 +25,7 @@ const index = async (_req: Request, res: Response): Promise<void> => {
 };
 
 const show = async (_req: Request, res: Response): Promise<void> => {
-  const user = await store.show(_req.params.id);
+  const user = await store.show(Number(_req.params.id));
   res.json(user);
 };
 
@@ -46,7 +46,7 @@ const create = async (_req: Request, res: Response): Promise<void> => {
 };
 
 const destroy = async (_req: Request, res: Response): Promise<void> => {
-  const deleted = await store.delete(_req.body.id);
+  const deleted = await store.delete(Number(_req.params.id));
   res.json(deleted);
 };
 
@@ -71,6 +71,7 @@ const authenticate = async (
         },
         tokenSecret
       );
+      _req.headers['Authorization'] = `Bearer ${token}`;
       res.send(token);
     } else {
       res.status(400).json({ msg: 'email or password is incorrect' });

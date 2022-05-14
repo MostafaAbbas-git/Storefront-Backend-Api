@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 const tokenSecret = String(process.env.TOKEN_SECRET);
 
-export async function validateRequiredUserBodyFields(
+export async function validateUserInputsMiddleware(
   req: Request,
   res: Response,
   next: NextFunction
@@ -27,7 +27,8 @@ export async function authMiddleware(
   if (!token) return res.status(401).send('Access denied. No token provided.');
 
   try {
-    jwt.verify(token, tokenSecret);
+    const decoded = jwt.verify(token, tokenSecret);
+    req.headers['user'] = decoded as string;
 
     next();
   } catch (error) {

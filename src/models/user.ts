@@ -28,7 +28,7 @@ export class UserStore {
     }
   }
 
-  async show(id: string): Promise<User> {
+  async show(id: number): Promise<User> {
     try {
       const sql = 'SELECT * FROM users WHERE id=($1)';
       //@ts-ignoreX$
@@ -115,13 +115,17 @@ export class UserStore {
     }
   }
 
-  async delete(id: string): Promise<User> {
+  async delete(id: number): Promise<User> {
     try {
       const conn = await Client.connect();
-      const sql = 'DELETE FROM users WHERE id=($1)';
+      const sql = 'DELETE FROM users WHERE id=($1) RETURNING *';
 
       const result = await conn.query(sql, [id]);
-
+      if (result.rows.length == 0) {
+        throw new Error(
+          `Could not delete user with id: ${id}. Does not exist.`
+        );
+      }
       const product = result.rows[0];
 
       conn.release();
