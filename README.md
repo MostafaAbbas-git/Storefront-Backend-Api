@@ -55,11 +55,9 @@ This is an E-commerce API that...
 
 - HomePage: http://localhost:3000/api
 
-- Processing images: http://localhost:3000/api/images
-
-- Required query parameters:
+- ONE:
   ```sh
-  api/images?filename={image_name}&width={new_width}&height={new_height}
+  Write your route link here
   ```
 
 ## Author

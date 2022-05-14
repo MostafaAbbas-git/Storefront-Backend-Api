@@ -1,7 +1,6 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import articleRoutes from './handlers/books';
 import userRoutes from './handlers/users';
 import productRoutes from './handlers/products';
 import ordersRoutes from './handlers/orders';
@@ -22,7 +21,6 @@ app.get('/', function (req: Request, res: Response) {
   res.send('Hello World!');
 });
 
-articleRoutes(app);
 productRoutes(app);
 ordersRoutes(app);
 userRoutes(app);

@@ -9,6 +9,8 @@
     "test": "jasmine-ts",
     "tsc": "tsc",
     "test-ts": "npm run test-db-up && npm run jasmine && npm run test-db-down",
+    "create-db": "db-migrate db:create storefront",
+    "create-test-db": "db-migrate db:create storefront_test",
     "migrate-up": "cross-env ENV=dev db-migrate --env dev up",
     "migrate-down": "cross-env ENV=dev db-migrate --env dev down",
     "create-migration": "db-migrate create migrations --sql-file",
@@ -29,6 +31,7 @@
     "db-migrate-pg": "^1.2.2",
     "dotenv": "^16.0.0",
     "express": "^4.17.1",
+    "joi-typescript-validator": "^0.2.0",
     "jsonwebtoken": "^8.5.1",
     "pg": "^8.7.3"
   },
