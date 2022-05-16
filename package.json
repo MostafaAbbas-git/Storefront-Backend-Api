@@ -7,7 +7,7 @@
     "start": "node dist/server",
     "start-dev": "cross-env ENV=dev nodemon --exec npx ts-node src/server.ts",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess \"node ./dist/server.js\"",
-    "test": "npm run migrate-test-up && npm run jasmine && npm run migrate-test-down",
+    "test": "npm run create-test-db && npm run migrate-test-up && npm run jasmine && npm run migrate-test-down",
     "jasmine-ts": "cross-env ENV=test jasmine-ts",
     "jasmine": "cross-env ENV=test jasmine",
     "tsc": "tsc",

@@ -18,27 +18,58 @@ This is an E-commerce API.
 
 ## Setting Up the Environment
 
+**_PS_**: make sure you have a PostgreSQL server installed in your system. If not, refer to the PostgreSQL documentation on [www.postgresql.org](www.postgresql.org) to install the server.
+<br></br>
+
 1. Install the requirements and dependancies
 
    ```sh
    npm install
    ```
 
+2. Create the database <br>
+
+   - In the Windows Command Prompt, run the command:
+
+   ```sh
+   psql -U userName
+   or just use 'psql' to login with your root PostgreSQL user.
+   ```
+
+   - Enter your password when prompted.
+
+   ```sh
+   {Your_Passowrd}
+   ```
+
+   - Run the following command to create the main database used for `development`:
+
+   ```sh
+   CREATE DATABASE storefront WITH ENCODING 'UTF8';
+   ```
+
+   - Connect to the new database using the command:
+
+   ```sh
+   \c storefront
+   ```
+
+   - Terminate the process using the following command:
+
+   ```sh
+   \q
+   ```
+
 ## Run Scripts
 
-- **Create the database** <br>
+- Rename `.env.example` file to `.env`
+- Write your PostgreSQL user name and password in `.env`
 
-  - Rename `.env.example` file to `.env`
-  - Write your PostgreSQL user name and password in `.env`
-  - Run the following commands to create two databases, one for development and one for testing <br>
+<!-- - Run the following commands to create the database needed for `testing`
 
-    ```sh
-    npm run create-dev-db
-    ```
-
-    ```sh
-    npm run create-test-db
-    ```
+  ```sh
+  npm run create-test-db
+  ``` -->
 
 - Build the project
 
@@ -58,7 +89,8 @@ This is an E-commerce API.
   npm run start
   ```
 
-- Run tests
+- Run tests <br>
+  **_PS_**: The following command will run the following scripts in sequence: Create testing database named: `storefront_test`, Migrate up the testing database, run testing scripts, and finally migrate down. Notice that the testing database will not be dropped.
 
   ```sh
   npm run test
@@ -77,20 +109,10 @@ This is an E-commerce API.
   http://localhost:3000/
   ```
 
-- Users:
-  ```sh
-  http://localhost:3000/users
-  ```
 - Products:
   ```sh
   http://localhost:3000/products
   ```
-- Orders:
-
-  ```sh
-  http://localhost:3000/orders
-  ```
-
 - Dashboard:
   ```sh
   http://localhost:3000/dashboard/five-most-popular
