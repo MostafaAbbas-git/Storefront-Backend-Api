@@ -13,8 +13,8 @@ export type User = {
   user_role?: number;
 };
 
-export class UserStore {
-  async index(): Promise<User[]> {
+export class UserModel {
+  async index(): Promise<User[] | Error> {
     try {
       //@ts-ignore
       const conn = await Client.connect();
@@ -25,7 +25,7 @@ export class UserStore {
 
       return result.rows;
     } catch (err) {
-      throw new Error(`unable get users: ${err}`);
+      return new Error(`unable get users: ${err}`);
     }
   }
 

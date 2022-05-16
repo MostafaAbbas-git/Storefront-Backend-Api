@@ -18,7 +18,7 @@ This is an E-commerce API.
 
 ## Setting Up the Environment
 
-1. Install the requirements and dependancies\
+1. Install the requirements and dependancies
 
    ```sh
    npm install
@@ -26,27 +26,30 @@ This is an E-commerce API.
 
 ## Run Scripts
 
+- **Create the database** <br>
+
+  - Rename `.env.example` file to `.env`
+  - Write your PostgreSQL user name and password in `.env`
+  - Run the following commands to create two databases, one for development and one for testing <br>
+
+    ```sh
+    npm run create-dev-db
+    ```
+
+    ```sh
+    npm run create-test-db
+    ```
+
 - Build the project
 
   ```sh
   npm run build
   ```
 
-- Create Database
-
-  ```sh
-  npm run create-db
-  ```
-
-  **PS**: To create a new database using the existing configurations, you have to create a new PostgreSQL user with name: {storeuser}, password: {password123}.<br>
-  _Or_ <br>
-  modify `.env` file with your PostgreSQL username and password, then create a new database using the commands mentioned above.
-  <br><br/>
-
 - Migrate Database
 
   ```sh
-  npm run migrate-up
+  npm run migrate-dev-up
   ```
 
 - Run the project
@@ -55,8 +58,8 @@ This is an E-commerce API.
   npm run start
   ```
 
-- Run tests\
-   _PS:_ Running this scipt will build the project first, and then it will run jasmine test script.
+- Run tests
+
   ```sh
   npm run test
   ```

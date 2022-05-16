@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { User, UserStore } from '../models/user';
+import { User, UserModel } from '../models/user';
 import {
   authMiddleware,
   validateUserInputsMiddleware,
@@ -24,13 +24,13 @@ const userRoutes = (app: express.Application) => {
   app.delete('/users/delete', [authMiddleware, adminMiddleware], destroy);
 };
 
-const store = new UserStore();
+const userModel = new UserModel();
 const tokenSecret = String(process.env.TOKEN_SECRET);
 
 const index = async (_req: Request, res: Response): Promise<void | unknown> => {
   try {
     console.log('index all users');
-    const users = await store.index();
+    const users = await userModel.index();
     res.json(users);
   } catch (err) {
     return res.status(400).json(err);
@@ -40,7 +40,7 @@ const index = async (_req: Request, res: Response): Promise<void | unknown> => {
 const show = async (_req: Request, res: Response): Promise<void | unknown> => {
   try {
     console.log('show one user');
-    const user = await store.show(Number(_req.body.userId));
+    const user = await userModel.show(Number(_req.body.userId));
     res.json(user);
   } catch (err) {
     return res.status(400).json(err);
@@ -52,14 +52,17 @@ const showMyProfileData = async (
   res: Response
 ): Promise<void | unknown> => {
   try {
-    const user = await store.show(Number(_req.user.id));
+    const user = await userModel.show(Number(_req.user.id));
     res.json(user);
   } catch (err) {
     return res.status(400).json(err);
   }
 };
 
-const create = async (_req: Request, res: Response): Promise<unknown> => {
+const create = async (
+  _req: Request,
+  res: Response
+): Promise<unknown | void> => {
   const user: User = {
     email: _req.body.email,
     first_name: _req.body.first_name,
@@ -68,8 +71,11 @@ const create = async (_req: Request, res: Response): Promise<unknown> => {
     user_role: _req.body.user_role,
   };
   try {
-    const newUser = await store.create(user);
-    res.json(newUser);
+    const result = await userModel.create(user);
+    if (typeof result != 'object') {
+      return res.status(400).json(result);
+    }
+    return res.status(200).json(result);
   } catch (err) {
     console.log(err);
     return res.status(400).json(err);
@@ -82,7 +88,7 @@ const destroy = async (
 ): Promise<void | unknown> => {
   try {
     const userId: number = Number(_req.body.userId);
-    const deletedUser = await store.delete(userId);
+    const deletedUser = await userModel.delete(userId);
 
     res.json(deletedUser);
   } catch (err) {
@@ -100,7 +106,7 @@ const authenticate = async (
     password: _req.body.password,
   };
   try {
-    const result = await store.authenticate(user.email, user.password);
+    const result = await userModel.authenticate(user.email, user.password);
 
     if (result.email !== '') {
       var token = jwt.sign(
@@ -124,7 +130,7 @@ const authenticate = async (
 };
 const update = async (_req: Request, res: Response): Promise<unknown> => {
   // check if new email already registered to another user
-  const userCheck = await store.checkUserByEmail(_req.body.email);
+  const userCheck = await userModel.checkUserByEmail(_req.body.email);
 
   if (typeof userCheck !== 'undefined') {
     if (userCheck.email != _req.user.email) {
@@ -143,7 +149,7 @@ const update = async (_req: Request, res: Response): Promise<unknown> => {
   };
 
   try {
-    const updatedUser = await store.update(user);
+    const updatedUser = await userModel.update(user);
     res.json({
       msg: 'Your data has been updated successfully. Please relogin to make sure that your new data is shown correctly.',
       updatedUser,
@@ -162,7 +168,10 @@ const patchUserRoleByEmail = async (
   const newUserRole: number = _req.body.user_role;
 
   try {
-    const updatedUser = await store.patchUserRoleByEmail(email, newUserRole);
+    const updatedUser = await userModel.patchUserRoleByEmail(
+      email,
+      newUserRole
+    );
     res.json({
       msg: 'User role updated successfully.',
       updatedUser,

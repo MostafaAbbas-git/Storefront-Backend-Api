@@ -26,6 +26,8 @@ ordersRoutes(app);
 userRoutes(app);
 dashboardRoutes(app);
 
-app.listen(3000, function () {
+const server = app.listen(3000, function () {
   console.log(`starting app on: ${address}`);
 });
+
+export { server, app };
