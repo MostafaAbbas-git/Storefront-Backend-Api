@@ -89,11 +89,18 @@ This is an E-commerce API.
   npm run start
   ```
 
-- Run tests <br>
+- Run tests FOR THE FIRST TIME <br>
   **_PS_**: The following command will run the following scripts in sequence: Create testing database named: `storefront_test`, Migrate up the testing database, run testing scripts, and finally migrate down. Notice that the testing database will not be dropped.
 
   ```sh
   npm run test
+  ```
+
+- Run tests LATER <br>
+  **_PS_**: We Cannot command `npm run test` one more time because as mentioned above, it creates the database. But now we have built the project and only wants to run the test scripts separately. To do so, run the following command:
+
+  ```sh
+  npm run jasmine
   ```
 
 ---
