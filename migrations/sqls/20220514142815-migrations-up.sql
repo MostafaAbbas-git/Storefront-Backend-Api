@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS users(
     first_name VARCHAR(255),
     last_name VARCHAR(255),
     email VARCHAR (50) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL
+    password VARCHAR(255) NOT NULL,
+    user_role integer default 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS products(
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS orders(
 
 CREATE TABLE IF NOT EXISTS order_products(
     id SERIAL PRIMARY KEY,
-    quantities integer [],
-    product_ids integer [],
-    order_id bigint REFERENCES orders(id)
+    quantity integer,
+    order_id bigint REFERENCES orders(id),
+    product_id bigint REFERENCES products(id)
 );

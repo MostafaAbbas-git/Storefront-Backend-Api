@@ -2,9 +2,9 @@
 import Client from '../database';
 
 export type Product = {
-  id?: string;
+  id?: number;
   name: string;
-  price: string;
+  price: number;
   category?: string;
 };
 
@@ -26,13 +26,17 @@ export class ProductStore {
     }
   }
 
-  async show(id: number): Promise<Product> {
+  async show(id: number): Promise<Product | string> {
     try {
       const sql = 'SELECT * FROM products WHERE id=($1)';
       // @ts-ignore
       const conn = await Client.connect();
 
       const result = await conn.query(sql, [id]);
+
+      if (result.rows.length == 0) {
+        return `Product with id: ${id} does not exist`;
+      }
 
       conn.release();
 
@@ -61,7 +65,7 @@ export class ProductStore {
     }
   }
 
-  async delete(id: number): Promise<Product> {
+  async delete(id: number): Promise<Product | string> {
     try {
       const sql = 'DELETE FROM products WHERE id=($1) RETURNING *';
       // @ts-ignore
@@ -69,9 +73,7 @@ export class ProductStore {
 
       const result = await conn.query(sql, [id]);
       if (result.rows.length == 0) {
-        throw new Error(
-          `Could not delete product with id: ${id}. Does not exist`
-        );
+        return `Could not delete product with id: ${id}. Does not exist`;
       }
 
       const product = result.rows[0];

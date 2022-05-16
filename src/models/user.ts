@@ -10,6 +10,7 @@ export type User = {
   last_name?: string;
   email: string;
   password: string;
+  user_role?: number;
 };
 
 export class UserStore {
@@ -44,12 +45,29 @@ export class UserStore {
     }
   }
 
-  async create(u: User): Promise<User | unknown> {
+  async checkUserByEmail(email: string): Promise<User> {
+    try {
+      const sql = 'SELECT * FROM users WHERE email=($1)';
+      //@ts-ignoreX$
+      const conn = await Client.connect();
+
+      const result = await conn.query(sql, [email]);
+
+      conn.release();
+
+      return result.rows[0];
+    } catch (err) {
+      console.error(err);
+      throw new Error(`unable show user ${email}: ${err}`);
+    }
+  }
+
+  async create(u: User): Promise<User | string> {
     try {
       // @ts-ignore
       const conn = await Client.connect();
       const sql =
-        'INSERT INTO users (email, first_name, last_name, password) VALUES($1, $2, $3, $4) RETURNING *';
+        'INSERT INTO users (email, first_name, last_name, password, user_role) VALUES($1, $2, $3, $4, $5) RETURNING *';
 
       const hash = bcrypt.hashSync(u.password + pepper, saltRounds);
 
@@ -58,6 +76,7 @@ export class UserStore {
         u.first_name,
         u.last_name,
         hash,
+        u.user_role,
       ]);
       const user = result.rows[0];
 
@@ -65,45 +84,24 @@ export class UserStore {
 
       return user;
     } catch (err) {
-      throw new Error(`unable create user (${u.email}): ${err}`);
+      return `unable to create user (${u.email}): ${err}`;
     }
   }
-  async update(updatedObj: User, currentEmail: string): Promise<User> {
-    if (updatedObj.email != currentEmail) {
-      // check if the new email already assigned to another user.
-      try {
-        // @ts-ignore
-        const conn = await Client.connect();
-        const sql = 'SELECT * FROM users WHERE email=($1)';
 
-        const result = await conn.query(sql, [updatedObj.email]);
-        conn.release();
-
-        if (result.rows.length != 0) {
-          // Email already assigned to another user
-          throw new Error(
-            `Unable to update user data. Email: ${updatedObj.email} already assigned to another`
-          );
-        }
-      } catch (error) {
-        throw new Error(`Unable to query on new email: ${error}`);
-      }
-    }
-
+  async update(u: User): Promise<User> {
     try {
       // @ts-ignore
       const conn = await Client.connect();
-      // const sql = `UPDATE users SET (email, first_name, last_name, password) = ($1, $2, $3, $4) WHERE email = ${currentEmail} RETURNING *`;
       const sql =
-        'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE email=($5) RETURNING *';
-      const hash = bcrypt.hashSync(updatedObj.password + pepper, saltRounds);
+        'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *';
+      const hash = bcrypt.hashSync(u.password + pepper, saltRounds);
 
       const result = await conn.query(sql, [
-        updatedObj.first_name,
-        updatedObj.last_name,
-        updatedObj.email,
+        u.first_name,
+        u.last_name,
+        u.email,
         hash,
-        currentEmail,
+        u.id,
       ]);
       const user = result.rows[0];
 
@@ -111,28 +109,50 @@ export class UserStore {
 
       return user;
     } catch (err) {
-      throw new Error(`unable to update user (${currentEmail}): ${err}`);
+      throw new Error(`unable to update user with id: (${u.id}): ${err}`);
     }
   }
 
-  async delete(id: number): Promise<User> {
+  async patchUserRoleByEmail(
+    user_email: string,
+    user_role: number
+  ): Promise<User> {
+    try {
+      // @ts-ignore
+      const conn = await Client.connect();
+      const sql =
+        'UPDATE users SET user_role=($1) WHERE email=($2) RETURNING *';
+
+      const result = await conn.query(sql, [user_role, user_email]);
+      const user = result.rows[0];
+
+      conn.release();
+
+      return user;
+    } catch (err) {
+      throw new Error(
+        `unable to patch user role with email: (${user_email}): ${err}`
+      );
+    }
+  }
+
+  async delete(id: number): Promise<User | string> {
     try {
       const conn = await Client.connect();
       const sql = 'DELETE FROM users WHERE id=($1) RETURNING *';
 
       const result = await conn.query(sql, [id]);
       if (result.rows.length == 0) {
-        throw new Error(
-          `Could not delete user with id: ${id}. Does not exist.`
-        );
+        return `Could not delete user with id: ${id}. Does not exist.`;
       }
-      const product = result.rows[0];
+      const user = result.rows[0];
 
       conn.release();
 
-      return product;
+      return user;
     } catch (err) {
-      throw new Error(`unable delete user (${id}): ${err}`);
+      console.error(err);
+      throw new Error(`unable to delete user with id: (${id}): ${err}`);
     }
   }
 

@@ -2,28 +2,46 @@ import express, { Request, Response } from 'express';
 import { Product, ProductStore } from '../models/product';
 
 import { validateProductInputsMiddleware } from '../middleware/products.middleware';
+import {
+  authMiddleware,
+  adminMiddleware,
+} from '../middleware/users.middleware';
 
 const productRoutes = (app: express.Application) => {
   app.get('/products', index);
   app.get('/products/:id', show);
-  app.post('/products', validateProductInputsMiddleware, create);
-  app.delete('/products/:id', destroy);
+  app.post(
+    '/products',
+    [authMiddleware, adminMiddleware, validateProductInputsMiddleware],
+    create
+  );
+  app.delete('/products/:id', [authMiddleware, adminMiddleware], destroy);
 };
 
 const store = new ProductStore();
-const tokenSecret = String(process.env.TOKEN_SECRET);
 
-const index = async (_req: Request, res: Response) => {
-  const products = await store.index();
-  res.json(products);
+const index = async (_req: Request, res: Response): Promise<void | unknown> => {
+  try {
+    const products = await store.index();
+    res.json(products);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
 };
 
-const show = async (_req: Request, res: Response) => {
-  const product = await store.show(Number(_req.params.id));
-  res.json(product);
+const show = async (_req: Request, res: Response): Promise<void | unknown> => {
+  try {
+    const product = await store.show(Number(_req.params.id));
+    res.json(product);
+  } catch (err) {
+    return res.status(400).json(err);
+  }
 };
 
-const create = async (_req: Request, res: Response) => {
+const create = async (
+  _req: Request,
+  res: Response
+): Promise<void | unknown> => {
   try {
     const product: Product = {
       name: _req.body.name,
@@ -35,17 +53,18 @@ const create = async (_req: Request, res: Response) => {
 
     res.json(newProduct);
   } catch (err) {
-    res.status(400);
-    res.json(err);
+    return res.status(400).json(err);
   }
 };
-const destroy = async (_req: Request, res: Response) => {
+const destroy = async (
+  _req: Request,
+  res: Response
+): Promise<void | unknown> => {
   try {
     const deleted = await store.delete(Number(_req.params.id));
     res.json(deleted);
-  } catch (error) {
-    res.status(400);
-    res.json({ error });
+  } catch (err) {
+    return res.status(400).json(err);
   }
 };
 

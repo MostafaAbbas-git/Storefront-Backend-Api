@@ -10,7 +10,7 @@ const app: express.Application = express();
 const address: string = '0.0.0.0:3000';
 
 const corsOptions = {
-  origin: 'http://localhost',
+  origin: 'http://localhost:3000',
   optionSuccessStatus: 200,
 };
 
@@ -18,7 +18,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.get('/', function (req: Request, res: Response) {
-  res.send('Hello World!');
+  res.send('E-Commerce Api ');
 });
 
 productRoutes(app);
