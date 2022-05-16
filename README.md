@@ -63,7 +63,7 @@ This is an E-commerce API.
 
 ---
 
-## Main Endpoints
+## Endpoints
 
 - Full API Documentation:
   [Go to the Documentation Page](https://documenter.getpostman.com/view/14046968/UyxjFmBM#65ae3ab3-93b2-4b06-8b73-ebe5079bc80b)
