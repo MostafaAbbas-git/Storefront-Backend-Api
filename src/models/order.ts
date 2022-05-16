@@ -63,9 +63,9 @@ export class OrderStore {
     }
   }
 
-  async getPendingOrderByUserId(user_id: number): Promise<Order> {
+  async getOrderByUserId(user_id: number, status: string): Promise<Order> {
     try {
-      const orderStatus = 'Pending';
+      const orderStatus: string = status;
       const sql = 'SELECT * FROM orders WHERE user_id=($1) AND status=($2)';
 
       // @ts-ignore

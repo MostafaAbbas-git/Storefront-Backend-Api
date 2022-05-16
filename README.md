@@ -1,6 +1,6 @@
 # Storefront-Backend-Api
 
-This is an E-commerce API that...
+This is an E-commerce API.
 
 ## Table of Contents
 
@@ -32,16 +32,28 @@ This is an E-commerce API that...
   npm run build
   ```
 
+- Create Database
+
+  ```sh
+  npm run create-db
+  ```
+
+  **PS**: To create a new database using the existing configurations, you have to create a new PostgreSQL user with name: {storeuser}, password: {password123}.<br>
+  _Or_ <br>
+  modify `.env` file with your PostgreSQL username and password, then create a new database using the commands mentioned above.
+  <br><br/>
+
+- Migrate Database
+
+  ```sh
+  npm run migrate-up
+  ```
+
 - Run the project
 
   ```sh
   npm run start
-  or
-  node dist/index.js
   ```
-
-  **PS**: Write your note here
-  <br><br/>
 
 - Run tests\
    _PS:_ Running this scipt will build the project first, and then it will run jasmine test script.
@@ -51,13 +63,34 @@ This is an E-commerce API that...
 
 ---
 
-## Endpoints
+## Main Endpoints
 
-- HomePage: http://localhost:3000/api
+- Full API Documentation:
+  [Go to the Documentation Page](https://documenter.getpostman.com/view/14046968/UyxjFmBM#65ae3ab3-93b2-4b06-8b73-ebe5079bc80b)
 
-- ONE:
+- HomePage:
+
   ```sh
-  Write your route link here
+  http://localhost:3000/
+  ```
+
+- Users:
+  ```sh
+  http://localhost:3000/users
+  ```
+- Products:
+  ```sh
+  http://localhost:3000/products
+  ```
+- Orders:
+
+  ```sh
+  http://localhost:3000/orders
+  ```
+
+- Dashboard:
+  ```sh
+  http://localhost:3000/dashboard/five-most-popular
   ```
 
 ## Author

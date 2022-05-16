@@ -14,5 +14,5 @@
   },
   "exclude": ["node_modules", "./dist", "spec", "migrations"],
 
-  "include": ["./src/**/*", "src/interface.d.ts"]
+  "include": ["./src/**/*"]
 }

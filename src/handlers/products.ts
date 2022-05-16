@@ -10,11 +10,13 @@ import {
 const productRoutes = (app: express.Application) => {
   app.get('/products', index);
   app.get('/products/:id', show);
+
   app.post(
     '/products',
     [authMiddleware, adminMiddleware, validateProductInputsMiddleware],
     create
   );
+
   app.delete('/products/:id', [authMiddleware, adminMiddleware], destroy);
 };
 

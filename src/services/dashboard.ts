@@ -1,16 +1,17 @@
+/* eslint-disable indent */
 import Client from '../database';
 
 export class DashboardQueries {
-  // Get all products that have been included in orders
   async productsInOrders(): Promise<
     { name: string; price: number; order_id: string }[]
     // eslint-disable-next-line indent
   > {
+    // Get all products that have been included in orders
     try {
       //@ts-ignore
       const conn = await Client.connect();
       const sql =
-        'SELECT name, price, order_id FROM products INNER JOIN order_products ON product.id = order_products.id RETURNING *';
+        'SELECT name, price, order_id FROM products INNER JOIN order_products ON products.id = order_products.id';
 
       const result = await conn.query(sql);
 
@@ -22,12 +23,14 @@ export class DashboardQueries {
     }
   }
 
-  async usersWithOrders(): Promise<{ firstName: string; lastName: string }[]> {
+  async usersWithOrders(): Promise<
+    { firstName: string; lastName: string; orderId: number }[]
+  > {
     try {
       //@ts-ignore
       const conn = await Client.connect();
       const sql =
-        'SELECT first_name, last_name FROM users INNER JOIN orders ON users.id = orders.user_id';
+        'SELECT first_name, last_name, orders.id AS order_id FROM users INNER JOIN orders ON users.id = orders.user_id';
 
       const result = await conn.query(sql);
 
@@ -40,7 +43,9 @@ export class DashboardQueries {
   }
 
   // Get all users that have made orders
-  async fiveMostExpensive(): Promise<{ name: string; price: number }[]> {
+  async fiveMostExpensiveProducts(): Promise<
+    { name: string; price: number }[]
+  > {
     try {
       //@ts-ignore
       const conn = await Client.connect();
@@ -54,6 +59,45 @@ export class DashboardQueries {
       return result.rows;
     } catch (err) {
       throw new Error(`unable get products by price: ${err}`);
+    }
+  }
+
+  async fiveMostPopularProducts(): Promise<
+    { product_id: number; value_occurrence: number }[]
+    // eslint-disable-next-line indent
+  > {
+    try {
+      //@ts-ignore
+      const conn = await Client.connect();
+      const sql =
+        'SELECT product_id, COUNT(product_id) AS value_occurrence FROM order_products GROUP BY product_id ORDER BY value_occurrence DESC LIMIT 5';
+
+      const result = await conn.query(sql);
+
+      conn.release();
+
+      return result.rows;
+    } catch (err) {
+      console.error(err);
+      throw new Error('unable get fiveMostPopularProducts');
+    }
+  }
+
+  async indexProductsByCategory(category: string): Promise<Object[] | unknown> {
+    try {
+      //@ts-ignore
+      const conn = await Client.connect();
+      const sql =
+        'SELECT * FROM products WHERE category=($1) ORDER BY products.id ASC';
+
+      const result = await conn.query(sql, [category]);
+
+      conn.release();
+
+      return result.rows;
+    } catch (err) {
+      console.error(err);
+      throw new Error('unable indexProductsByCategory');
     }
   }
 }

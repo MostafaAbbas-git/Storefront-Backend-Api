@@ -34,13 +34,13 @@ const orderRoutes = (app: express.Application) => {
   app.post('/orders/add-to-cart', authMiddleware, addProductToCart);
 
   app.delete('/orders/delete', authMiddleware, destroy);
+
   app.patch(
     '/orders/mycart/removeProduct',
     authMiddleware,
     removeProductFromCart
   );
-
-  app.patch('/orders/submit/:orderId', authMiddleware, submitMyOrder);
+  app.patch('/orders/submit', authMiddleware, submitMyOrder);
 };
 
 const store = new OrderStore();
@@ -162,15 +162,18 @@ const showMyPendingOrder = async (
 ): Promise<void | unknown> => {
   try {
     const user_id: number = Number(_req.user.id);
-
-    const order: Order = await store.getPendingOrderByUserId(user_id);
+    const status: string = 'Pending';
+    const order: Order = await store.getOrderByUserId(user_id, status);
     res.json(order);
   } catch (err) {
     return res.status(400).json(err);
   }
 };
 
-const indexMyCart = async (_req: Request, res: Response) => {
+const indexMyCart = async (
+  _req: Request,
+  res: Response
+): Promise<Cart[] | unknown> => {
   const userId: number = Number(_req.user.id);
 
   try {
@@ -187,11 +190,14 @@ const indexMyCart = async (_req: Request, res: Response) => {
   }
 };
 
-const create = async (_req: Request, res: Response) => {
-  const user_id = _req.user.id as number;
-
+const create = async (
+  _req: Request,
+  res: Response
+): Promise<unknown | void> => {
+  const user_id = Number(_req.user.id);
+  const status: string = 'Pending';
   try {
-    const order = await store.getPendingOrderByUserId(user_id);
+    const order = await store.getOrderByUserId(user_id, status);
     if (typeof order !== 'undefined') {
       return res.json(
         'You already have a pending order in the store. Submit your order before creating a new one'
@@ -201,8 +207,6 @@ const create = async (_req: Request, res: Response) => {
     throw new Error(`${error}`);
   }
   try {
-    // current logged in user_id
-
     const order: Order = {
       status: 'Pending',
       user_id,
@@ -223,18 +227,48 @@ const submitMyOrder = async (
   _req: Request,
   res: Response
 ): Promise<Order | unknown> => {
-  const orderId: number = Number(_req.params.orderId);
   const userId: number = Number(_req.user.id);
   const status: string = 'Active';
 
-  // check if the order is already Active
   try {
-    const fetchedOrder = await store.show(orderId, userId);
-    if (fetchedOrder.status == 'Active') {
-      return res
-        .status(400)
-        .json({ msg: `Order with id ${orderId} is already active.` });
+    // get orderId from the current pending order associated with current active user id
+    const pendingOrder = await store.getOrderByUserId(userId, 'Pending');
+
+    // Return if there is no pending order
+    if (typeof pendingOrder === 'undefined') {
+      return res.status(404).json({
+        Error: 'No pending order found to submit.',
+      });
     }
+
+    const orderId: number = Number(pendingOrder.id);
+
+    const order = await store.updateOrderStatus(orderId, status);
+    res.json(order);
+  } catch (err) {
+    console.error(err);
+    return res.status(400).send(err);
+  }
+};
+const markOrderAsCompleted = async (
+  _req: Request,
+  res: Response
+): Promise<Order | unknown> => {
+  const userId: number = Number(_req.body.userId);
+  const status: string = 'Delivered';
+
+  try {
+    // get orderId from the current pending order associated with current active user id
+    const ActiveOrder = await store.getOrderByUserId(userId, 'Active');
+
+    // Return if there is no active order
+    if (typeof ActiveOrder === 'undefined') {
+      return res.status(404).json({
+        Error: 'No pending order found to submit.',
+      });
+    }
+
+    const orderId: number = Number(ActiveOrder.id);
 
     const order = await store.updateOrderStatus(orderId, status);
     res.json(order);
@@ -255,7 +289,7 @@ const addProductToCart = async (
 
   try {
     // get orderId from the current pending order associated with current active user id
-    const pendingOrder = await store.getPendingOrderByUserId(userId);
+    const pendingOrder = await store.getOrderByUserId(userId, 'Pending');
 
     // Return if there is no pending order
     if (typeof pendingOrder === 'undefined') {
@@ -277,7 +311,10 @@ const addProductToCart = async (
   }
 };
 
-const removeProductFromCart = async (_req: Request, res: Response) => {
+const removeProductFromCart = async (
+  _req: Request,
+  res: Response
+): Promise<void | unknown> => {
   const productId: number = Number(_req.body.productId);
   const userId: number = Number(_req.user.id);
   let orderId: number;
@@ -318,19 +355,22 @@ const removeProductFromCart = async (_req: Request, res: Response) => {
   }
 };
 
-async function clearOrder(orderId: number, cart: Cart[]) {
+async function clearAllCartItems(orderId: number, cart: Cart[]): Promise<void> {
   for (const item of cart) {
     const product_id: number = Number(item.product_id);
     await store.removeProductFromCart(orderId, product_id);
   }
 }
 
-const destroy = async (_req: Request, res: Response) => {
+const destroy = async (
+  _req: Request,
+  res: Response
+): Promise<void | unknown> => {
   const userId: number = Number(_req.user.id);
 
   try {
     // get orderId from the current pending order associated with current active user id
-    const pendingOrder = await store.getPendingOrderByUserId(userId);
+    const pendingOrder = await store.getOrderByUserId(userId, 'Pending');
 
     // Return if there is no pending order
     if (typeof pendingOrder === 'undefined') {
@@ -343,7 +383,7 @@ const destroy = async (_req: Request, res: Response) => {
     // Clear the cart before deleting the order
     const myCart = await store.indexMyCart(userId);
 
-    await clearOrder(orderId, myCart as Cart[]);
+    await clearAllCartItems(orderId, myCart as Cart[]);
 
     // delete the empty pending order
     const deletedOrder = await store.delete(orderId, userId);
