@@ -39,7 +39,7 @@ This is an E-commerce API.
    - Enter your password when prompted.
 
    ```sh
-   {Your_Passowrd}
+   Your_Passowrd
    ```
 
    - Run the following command to create the main database used for `development`:
@@ -63,7 +63,7 @@ This is an E-commerce API.
 ## Run Scripts
 
 - Rename `.env.example` file to `.env`
-- Write your PostgreSQL user name and password in `.env`
+- Write your PostgreSQL userName and password in `.env`
 
 <!-- - Run the following commands to create the database needed for `testing`
 
