@@ -5,6 +5,7 @@ This is an E-commerce API.
 ## Table of Contents
 
 - [Toolbox](#toolbox)
+- [Database Setup](#Database-Setup)
 - [Setting Up the Environment](#setting-up-the-environment)
 - [Endpoints ](#endpoints)
 - [Author](#Author)
@@ -16,10 +17,21 @@ This is an E-commerce API.
 - Express
 - PostgreSQL
 
-## Setting Up the Environment
+## Database Setup
 
 **_PS_**: make sure you have a PostgreSQL server installed in your system. If not, refer to the PostgreSQL documentation on [www.postgresql.org](www.postgresql.org) to install the server.
 <br></br>
+
+The server application is configured to run with a Postgresql database running with the following settings:
+
+- Host: localhost
+- Port: 5432
+- Database user: "postgres"
+- Database name: "storefront"
+- Test database name: "storefront_test"
+- Create the database for devolpment and testing by followint the steps below.
+
+## Setting Up the Environment
 
 1. Install the requirements and dependancies
 
@@ -33,7 +45,6 @@ This is an E-commerce API.
 
    ```sh
    $ psql -U userName
-   or just use '$ psql' to login with your root PostgreSQL user.
    ```
 
    - Enter your password when prompted.
@@ -42,13 +53,28 @@ This is an E-commerce API.
    $ Your_Passowrd
    ```
 
-   - Run the following command to create the main database used for `development`:
+   - Create a PostgreSQL user:
+
+   ```sh
+   $ CREATE USER storeuser WITH PASSWORD 'password123';
+   ```
+
+   - Run the following commands to create the main database used for `development` and the testing one:
 
    ```sh
    $ CREATE DATABASE storefront WITH ENCODING 'UTF8';
+   $ CREATE DATABASE storefront_test WITH ENCODING 'UTF8';
    ```
 
-   - Connect to the new database using the command:
+   - Grant all database privileges to user in both databases:
+
+   ```sh
+   $ GRANT ALL PRIVILEGES ON DATABASE storefront TO storeuser;
+
+   $ GRANT ALL PRIVILEGES ON DATABASE storefront_test TO storeuser;
+   ```
+
+   - Connect to development database `storefront` using the command:
 
    ```sh
    $ \c storefront
@@ -65,16 +91,16 @@ This is an E-commerce API.
 - Rename `.env.example` file to `.env`
 - Write your PostgreSQL userName and password in `.env`
 
-<!-- - Run the following commands to create the database needed for `testing`
-
-  ```sh
-  npm run create-test-db
-  ``` -->
-
 - Build the project
 
   ```sh
   $ npm run build
+  ```
+
+- install db-migrate npm package globally
+
+  ```sh
+  $ npm install -g db-migrate
   ```
 
 - Migrate Database
@@ -85,22 +111,18 @@ This is an E-commerce API.
 
 - Run the project
 
+  - Host: localhost
+  - Port: 3000
+
   ```sh
   $ npm run start
   ```
 
-- Run tests FOR THE FIRST TIME <br>
-  **_PS_**: The following command will run the following scripts in sequence: Create testing database named: `storefront_test`, Migrate up the testing database, run testing scripts, and finally migrate down. Notice that the testing database will not be dropped.
+- Run tests <br>
+  **_PS_**: Testing database will not be dropped after runnint the tests.
 
   ```sh
   $ npm run test
-  ```
-
-- Run tests LATER <br>
-  **_PS_**: We Cannot command `npm run test` one more time because as mentioned above, it creates the database. But now we have built the project and only wants to run the test scripts separately. To do so, run the following command:
-
-  ```sh
-  $ npm run jasmine
   ```
 
 - To drop the `dev` or `test` database (For whatever the reason is).
@@ -121,20 +143,38 @@ This is an E-commerce API.
 - Full API Documentation:
   [Go to the Documentation Page](https://documenter.getpostman.com/view/14046968/UyxjFmBM#65ae3ab3-93b2-4b06-8b73-ebe5079bc80b)
 
-- HomePage:
-
-  ```sh
-  http://localhost:3000/
-  ```
-
-- Products:
-  ```sh
-  http://localhost:3000/products
-  ```
-- Dashboard:
-  ```sh
-  http://localhost:3000/dashboard/five-most-popular
-  ```
+| HTTP verbs | paths                             | Used for                                                   |
+| ---------- | --------------------------------- | ---------------------------------------------------------- |
+| GET        | /users/index                      | Index [token required] [admin required]                    |
+| GET        | /users/show                       | Show [token required] [admin required]                     |
+| PATCH      | /users/role                       | Change User Role [token required] [admin required]         |
+| DELETE     | /users/delete                     | Delete User [token required] [admin required]              |
+| GET        | /users/myProfile                  | Show Logged-in User Data [token required]                  |
+| POST       | /users                            | Create                                                     |
+| POST       | /users/authenticate               | Login                                                      |
+| PATCH      | /users/myProfile                  | Update Logged-in User Data [token required]                |
+| POST       | /products                         | Create [token required] [admin required]                   |
+| DELETE     | /products/:id                     | DELETE [token required] [admin required]                   |
+| GET        | /products                         | Index                                                      |
+| GET        | /products/:id                     | Show                                                       |
+| GET        | /orders                           | Index [token required] [admin required]                    |
+| GET        | /orders/pending-carts             | Index Pending Carts [token required] [admin required]      |
+| GET        | /orders/active-carts              | Index Active Carts [token required] [admin required]       |
+| GET        | /orders/show-one                  | Show [token required] [admin required]                     |
+| POST       | /orders                           | Create [token required]                                    |
+| POST       | /orders/add-to-cart               | Add Product To Cart [token required]                       |
+| PATCH      | /orders/mycart/removeProduct      | Remove Product From Cart [token required]                  |
+| GET        | /orders/mycart                    | Index Logged-in User Cart [token required]                 |
+| GET        | /orders/myorders/my-pending-order | Show Logged-in Pending Order [token required]              |
+| GET        | /orders/myorders/show-one         | Show One Order [token required]                            |
+| GET        | /orders/myorders/show-all         | Index All My Orders [token required]                       |
+| PATCH      | /orders/submit                    | Submit My Order [token required]                           |
+| DELETE     | /orders/delete                    | Delete My Order [token required]                           |
+| GET        | /dashboard/five-most-popular      | Index Popular Products                                     |
+| GET        | /dashboard/filter/:category       | Show Products By Category                                  |
+| GET        | /dashboard/five-most-expensive    | Index Most Expensive Products                              |
+| GET        | /dashboard/users-with-orders      | Index Users With Orders [token required] [admin required]  |
+| GET        | /dashboard/products_in_orders     | Index Products in Orders [token required] [admin required] |
 
 ## Author
 

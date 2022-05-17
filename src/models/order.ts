@@ -1,5 +1,5 @@
 // @ts-ignore
-import Client from '../database';
+import Client from '../startup/database';
 
 export type Order = {
   id?: number;
@@ -9,6 +9,13 @@ export type Order = {
 
 export type Cart = {
   id: number;
+  product_id: number;
+  quantity: number;
+};
+
+export type Order_Product = {
+  id: number;
+  order_id: number;
   product_id: number;
   quantity: number;
 };
@@ -98,14 +105,16 @@ export class OrderStore {
 
       return order;
     } catch (err) {
-      throw new Error(`Could not add new order ${o.status}. Error: ${err}`);
+      throw new Error(
+        `Could not add new order with status: ${o.status}. Error: ${err}`
+      );
     }
   }
   async addProductToCart(
     orderId: number,
     productId: number,
     quantity: number
-  ): Promise<Object | unknown | string> {
+  ): Promise<Order_Product | unknown | string> {
     try {
       const sql =
         'INSERT INTO order_products (order_id, product_id, quantity) VALUES($1, $2, $3) RETURNING *';

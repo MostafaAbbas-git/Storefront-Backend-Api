@@ -1,4 +1,5 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
+import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import { User, UserModel } from '../models/user';
 import {
@@ -6,6 +7,8 @@ import {
   validateUserInputsMiddleware,
   adminMiddleware,
 } from '../middleware/users.middleware';
+
+dotenv.config();
 
 const userRoutes = (app: express.Application) => {
   app.get('/users/index', [authMiddleware, adminMiddleware], index);
@@ -29,7 +32,6 @@ const tokenSecret = String(process.env.TOKEN_SECRET);
 
 const index = async (_req: Request, res: Response): Promise<void | unknown> => {
   try {
-    console.log('index all users');
     const users = await userModel.index();
     res.json(users);
   } catch (err) {
@@ -39,8 +41,7 @@ const index = async (_req: Request, res: Response): Promise<void | unknown> => {
 
 const show = async (_req: Request, res: Response): Promise<void | unknown> => {
   try {
-    console.log('show one user');
-    const user = await userModel.show(Number(_req.body.userId));
+    const user = await userModel.showUserById(Number(_req.body.userId));
     res.json(user);
   } catch (err) {
     return res.status(400).json(err);
@@ -52,7 +53,7 @@ const showMyProfileData = async (
   res: Response
 ): Promise<void | unknown> => {
   try {
-    const user = await userModel.show(Number(_req.user.id));
+    const user = await userModel.showUserById(Number(_req.user.id));
     res.json(user);
   } catch (err) {
     return res.status(400).json(err);
@@ -106,9 +107,12 @@ const authenticate = async (
     password: _req.body.password,
   };
   try {
-    const result = await userModel.authenticate(user.email, user.password);
+    const result: User | string = await userModel.authenticate(
+      user.email,
+      user.password
+    );
 
-    if (result.email !== '') {
+    if (typeof result !== 'string') {
       var token = jwt.sign(
         {
           id: Number(result.id),
@@ -122,15 +126,17 @@ const authenticate = async (
       _req.headers['Authorization'] = `Bearer ${token}`;
       res.send(token);
     } else {
-      res.status(400).json({ msg: 'email or password is incorrect' });
+      res
+        .status(400)
+        .json({ msg: `email or password is incorrect. Error: ${result}` });
     }
   } catch (err) {
-    return res.status(401).json({ msg: err, user });
+    return res.status(401).json({ msg: err });
   }
 };
 const update = async (_req: Request, res: Response): Promise<unknown> => {
   // check if new email already registered to another user
-  const userCheck = await userModel.checkUserByEmail(_req.body.email);
+  const userCheck = await userModel.showUserByEmail(_req.body.email);
 
   if (typeof userCheck !== 'undefined') {
     if (userCheck.email != _req.user.email) {

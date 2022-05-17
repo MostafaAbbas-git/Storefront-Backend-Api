@@ -1,10 +1,12 @@
 import { OrderStore } from '../../models/order';
 import { User, UserModel } from '../../models/user';
-import Client from '../../database';
+import Client from '../../startup/database';
 import { agent as _request } from 'supertest';
 import jwt from 'jsonwebtoken';
 import { app, server as mainServer } from '../../server';
+import dotenv from 'dotenv';
 
+dotenv.config();
 describe('handlers/orders integration test suite', () => {
   let server: { close: () => any };
 
@@ -51,14 +53,14 @@ describe('handlers/orders integration test suite', () => {
       token = jwt.sign(user, tokenSecret);
     });
 
-    it('should return 403 access denied for index all active carts as basic user', async () => {
+    it('should return 401 access denied for index all active carts as basic user', async () => {
       const createdUser = await userModel.create(user);
       token = jwt.sign(createdUser, tokenSecret);
 
       const res = await request
         .get('/orders/active-carts')
         .set('Authorization', `Bearer ${token}`);
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(401);
     });
   });
 

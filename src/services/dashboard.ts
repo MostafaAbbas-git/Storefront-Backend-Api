@@ -1,5 +1,5 @@
 /* eslint-disable indent */
-import Client from '../database';
+import Client from '../startup/database';
 
 export class DashboardQueries {
   async productsInOrders(): Promise<
@@ -11,7 +11,7 @@ export class DashboardQueries {
       //@ts-ignore
       const conn = await Client.connect();
       const sql =
-        'SELECT name, price, order_id FROM products INNER JOIN order_products ON products.id = order_products.id';
+        'SELECT name, price, order_id FROM products INNER JOIN order_products ON products.id = order_products.product_id';
 
       const result = await conn.query(sql);
 
@@ -42,7 +42,6 @@ export class DashboardQueries {
     }
   }
 
-  // Get all users that have made orders
   async fiveMostExpensiveProducts(): Promise<
     { name: string; price: number }[]
   > {

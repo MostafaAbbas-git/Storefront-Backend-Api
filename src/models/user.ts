@@ -1,8 +1,5 @@
-import Client from '../database';
-import bcrypt from 'bcrypt';
-
-const saltRounds = Number(process.env.SALT_ROUNDS);
-const pepper = process.env.BCRYPT_PASSWORD;
+import Client from '../startup/database';
+import { compareHash, createHash } from '../utilities/bcrypt';
 
 export type User = {
   id?: number;
@@ -29,7 +26,7 @@ export class UserModel {
     }
   }
 
-  async show(id: number): Promise<User> {
+  async showUserById(id: number): Promise<User> {
     try {
       const sql = 'SELECT * FROM users WHERE id=($1)';
       //@ts-ignoreX$
@@ -45,7 +42,7 @@ export class UserModel {
     }
   }
 
-  async checkUserByEmail(email: string): Promise<User> {
+  async showUserByEmail(email: string): Promise<User> {
     try {
       const sql = 'SELECT * FROM users WHERE email=($1)';
       //@ts-ignoreX$
@@ -69,7 +66,7 @@ export class UserModel {
       const sql =
         'INSERT INTO users (email, first_name, last_name, password, user_role) VALUES($1, $2, $3, $4, $5) RETURNING *';
 
-      const hash = bcrypt.hashSync(u.password + pepper, saltRounds);
+      const hash = createHash(u.password);
 
       const result = await conn.query(sql, [
         u.email,
@@ -94,7 +91,8 @@ export class UserModel {
       const conn = await Client.connect();
       const sql =
         'UPDATE users SET first_name=($1), last_name=($2), email=($3), password=($4) WHERE id=($5) RETURNING *';
-      const hash = bcrypt.hashSync(u.password + pepper, saltRounds);
+
+      const hash = createHash(u.password);
 
       const result = await conn.query(sql, [
         u.first_name,
@@ -156,25 +154,31 @@ export class UserModel {
     }
   }
 
-  async authenticate(email: string, password: string): Promise<User> {
-    const conn = await Client.connect();
-    const sql = 'SELECT * FROM users WHERE email=($1)';
+  async authenticate(email: string, password: string): Promise<User | string> {
+    try {
+      const conn = await Client.connect();
+      const sql = 'SELECT * FROM users WHERE email=($1)';
 
-    const result = await conn.query(sql, [email]);
+      const result = await conn.query(sql, [email]);
+      let user: User | string;
 
-    if (result.rows.length != 0) {
-      const user = result.rows[0];
+      if (result.rows.length != 0) {
+        user = result.rows[0] as User;
 
-      if (bcrypt.compareSync(password + pepper, user.password)) {
-        return user;
+        const hashResult: Boolean = compareHash(password, user.password);
+
+        conn.release();
+
+        if (hashResult) {
+          return user;
+        } else {
+          return 'email and password does not match. Authentication is false';
+        }
+      } else {
+        return `User with email: ${email} does not exist.`;
       }
+    } catch (err) {
+      return `unable to authenticate user with email: (${email}): ${err}`;
     }
-
-    const emptyReturnUser: User = {
-      email: '',
-      password: '',
-    };
-
-    return emptyReturnUser;
   }
 }

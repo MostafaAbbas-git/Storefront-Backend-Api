@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const tokenSecret = String(process.env.TOKEN_SECRET);
 interface UserMiddlewareInterface extends Object {
@@ -65,7 +68,7 @@ export async function adminMiddleware(
     if (user_role == 1) {
       next();
     } else {
-      return res.status(403).send('Access denied.');
+      return res.status(401).send({ Error: 'Access denied. Unauthorized.' });
     }
   } catch (error) {
     res.status(400).send({
