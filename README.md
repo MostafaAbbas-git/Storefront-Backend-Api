@@ -24,7 +24,7 @@ This is an E-commerce API.
 1. Install the requirements and dependancies
 
    ```sh
-   npm install
+   $ npm install
    ```
 
 2. Create the database <br>
@@ -32,32 +32,32 @@ This is an E-commerce API.
    - In the Windows Command Prompt, run the command:
 
    ```sh
-   psql -U userName
-   or just use 'psql' to login with your root PostgreSQL user.
+   $ psql -U userName
+   or just use '$ psql' to login with your root PostgreSQL user.
    ```
 
    - Enter your password when prompted.
 
    ```sh
-   Your_Passowrd
+   $ Your_Passowrd
    ```
 
    - Run the following command to create the main database used for `development`:
 
    ```sh
-   CREATE DATABASE storefront WITH ENCODING 'UTF8';
+   $ CREATE DATABASE storefront WITH ENCODING 'UTF8';
    ```
 
    - Connect to the new database using the command:
 
    ```sh
-   \c storefront
+   $ \c storefront
    ```
 
    - Terminate the process using the following command:
 
    ```sh
-   \q
+   $ \q
    ```
 
 ## Run Scripts
@@ -74,33 +74,44 @@ This is an E-commerce API.
 - Build the project
 
   ```sh
-  npm run build
+  $ npm run build
   ```
 
 - Migrate Database
 
   ```sh
-  npm run migrate-dev-up
+  $ npm run migrate-dev-up
   ```
 
 - Run the project
 
   ```sh
-  npm run start
+  $ npm run start
   ```
 
 - Run tests FOR THE FIRST TIME <br>
   **_PS_**: The following command will run the following scripts in sequence: Create testing database named: `storefront_test`, Migrate up the testing database, run testing scripts, and finally migrate down. Notice that the testing database will not be dropped.
 
   ```sh
-  npm run test
+  $ npm run test
   ```
 
 - Run tests LATER <br>
   **_PS_**: We Cannot command `npm run test` one more time because as mentioned above, it creates the database. But now we have built the project and only wants to run the test scripts separately. To do so, run the following command:
 
   ```sh
-  npm run jasmine
+  $ npm run jasmine
+  ```
+
+- To drop the `dev` or `test` database (For whatever the reason is).
+
+  ```sh
+  $ npm run drop-dev-db
+
+  or
+
+  $ npm run drop-test-db
+
   ```
 
 ---
