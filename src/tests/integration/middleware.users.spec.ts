@@ -5,10 +5,12 @@ import {
 } from '../../middleware/users.middleware';
 
 import { UserModel, User } from '../../models/user';
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+
 import { app, server as mainServer } from '../../server';
 import { agent as _request } from 'supertest';
+
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
 dotenv.config();
 

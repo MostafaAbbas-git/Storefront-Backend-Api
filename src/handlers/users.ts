@@ -12,7 +12,7 @@ dotenv.config();
 
 const userRoutes = (app: express.Application) => {
   app.get('/users/index', [authMiddleware, adminMiddleware], index);
-  app.get('/users/show', [authMiddleware, adminMiddleware], show);
+  app.get('/users/show/:userId', [authMiddleware, adminMiddleware], show);
   app.get('/users/myProfile', authMiddleware, showMyProfileData);
 
   app.post('/users/authenticate', validateUserInputsMiddleware, authenticate);
@@ -41,7 +41,7 @@ const index = async (_req: Request, res: Response): Promise<void | unknown> => {
 
 const show = async (_req: Request, res: Response): Promise<void | unknown> => {
   try {
-    const user = await userModel.showUserById(Number(_req.body.userId));
+    const user = await userModel.showUserById(Number(_req.params.userId));
     res.json(user);
   } catch (err) {
     return res.status(400).json(err);
@@ -124,14 +124,15 @@ const authenticate = async (
         tokenSecret
       );
       _req.headers['Authorization'] = `Bearer ${token}`;
-      res.send(token);
+
+      res.status(200).send(token);
     } else {
       res
         .status(400)
         .json({ msg: `email or password is incorrect. Error: ${result}` });
     }
   } catch (err) {
-    return res.status(401).json({ msg: err });
+    return res.status(401).json({ Error: err });
   }
 };
 const update = async (_req: Request, res: Response): Promise<unknown> => {

@@ -8,7 +8,11 @@ import {
 const orderRoutes = (app: express.Application) => {
   // Admin endpoints
   app.get('/orders', [authMiddleware, adminMiddleware], indexAllOrders);
-  app.get('/orders/show-one', [authMiddleware, adminMiddleware], showOneOrder);
+  app.get(
+    '/orders/show-one/:orderId/:userId',
+    [authMiddleware, adminMiddleware],
+    showOneOrder
+  );
   app.get(
     '/orders/pending-carts',
     [authMiddleware, adminMiddleware],
@@ -21,7 +25,11 @@ const orderRoutes = (app: express.Application) => {
   );
 
   // User endpoints
-  app.get('/orders/myorders/show-one', authMiddleware, showOneOfMyOrders);
+  app.get(
+    '/orders/myorders/show-one/:orderId',
+    authMiddleware,
+    showOneOfMyOrders
+  );
   app.get('/orders/myorders/show-all', authMiddleware, showAllMyOrders);
   app.get(
     '/orders/myorders/my-pending-order',
@@ -118,7 +126,7 @@ const showOneOfMyOrders = async (
 ): Promise<void | unknown> => {
   // show one of my orders
   try {
-    const orderId: number = Number(_req.body.orderId);
+    const orderId: number = Number(_req.params.orderId);
     const userId: number = Number(_req.user.id);
 
     const order = await store.show(orderId, userId);
@@ -140,8 +148,8 @@ const showOneOrder = async (
 ): Promise<void | unknown> => {
   // show any specific order (as admin)
   try {
-    const orderId: number = Number(_req.body.orderId);
-    const userId: number = Number(_req.body.userId);
+    const orderId: number = Number(_req.params.orderId);
+    const userId: number = Number(_req.params.userId);
 
     const order = await store.show(orderId, userId);
 

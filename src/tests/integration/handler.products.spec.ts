@@ -1,12 +1,15 @@
 import { Product, ProductStore } from '../../models/product';
 import { User, UserModel } from '../../models/user';
+
+import { app, server as mainServer } from '../../server';
 import Client from '../../startup/database';
 import { agent as _request } from 'supertest';
+
 import jwt from 'jsonwebtoken';
-import { app, server as mainServer } from '../../server';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
 describe('handlers/orders integration test suite', () => {
   let server: { close: () => any };
 
