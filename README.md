@@ -26,7 +26,7 @@ The server application is configured to run with a Postgresql database running w
 
 - Host: localhost
 - Port: 5432
-- Database user: "postgres"
+- Database user: "storeuser"
 - Database name: "storefront"
 - Test database name: "storefront_test"
 - Create the database for devolpment and testing by followint the steps below.
