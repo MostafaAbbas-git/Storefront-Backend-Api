@@ -258,33 +258,6 @@ const submitMyOrder = async (
     return res.status(400).send(err);
   }
 };
-// const markOrderAsCompleted = async (
-//   _req: Request,
-//   res: Response
-// ): Promise<Order | unknown> => {
-//   const userId: number = Number(_req.body.userId);
-//   const status: string = 'Delivered';
-
-//   try {
-//     // get orderId from the current pending order associated with current active user id
-//     const ActiveOrder = await store.getOrderByUserId(userId, 'Active');
-
-//     // Return if there is no active order
-//     if (typeof ActiveOrder === 'undefined') {
-//       return res.status(404).json({
-//         Error: 'No pending order found to submit.',
-//       });
-//     }
-
-//     const orderId: number = Number(ActiveOrder.id);
-
-//     const order = await store.updateOrderStatus(orderId, status);
-//     res.json(order);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(400).send(err);
-//   }
-// };
 
 const addProductToCart = async (
   _req: Request,
