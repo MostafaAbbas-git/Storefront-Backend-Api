@@ -143,38 +143,38 @@ The server application is configured to run with a Postgresql database running w
 - Full API Documentation:
   [Go to the Documentation Page](https://documenter.getpostman.com/view/14046968/UyxjFmBM#65ae3ab3-93b2-4b06-8b73-ebe5079bc80b)
 
-| HTTP verbs | paths                             | Used for                                                   |
-| ---------- | --------------------------------- | ---------------------------------------------------------- |
-| GET        | /users/index                      | Index [token required] [admin required]                    |
-| GET        | /users/show                       | Show [token required] [admin required]                     |
-| PATCH      | /users/role                       | Change User Role [token required] [admin required]         |
-| DELETE     | /users/delete                     | Delete User [token required] [admin required]              |
-| GET        | /users/myProfile                  | Show Logged-in User Data [token required]                  |
-| POST       | /users                            | Create                                                     |
-| POST       | /users/authenticate               | Login                                                      |
-| PATCH      | /users/myProfile                  | Update Logged-in User Data [token required]                |
-| POST       | /products                         | Create [token required] [admin required]                   |
-| DELETE     | /products/:id                     | DELETE [token required] [admin required]                   |
-| GET        | /products                         | Index                                                      |
-| GET        | /products/:id                     | Show                                                       |
-| GET        | /orders                           | Index [token required] [admin required]                    |
-| GET        | /orders/pending-carts             | Index Pending Carts [token required] [admin required]      |
-| GET        | /orders/active-carts              | Index Active Carts [token required] [admin required]       |
-| GET        | /orders/show-one                  | Show [token required] [admin required]                     |
-| POST       | /orders                           | Create [token required]                                    |
-| POST       | /orders/add-to-cart               | Add Product To Cart [token required]                       |
-| PATCH      | /orders/mycart/removeProduct      | Remove Product From Cart [token required]                  |
-| GET        | /orders/mycart                    | Index Logged-in User Cart [token required]                 |
-| GET        | /orders/myorders/my-pending-order | Show Logged-in Pending Order [token required]              |
-| GET        | /orders/myorders/show-one         | Show One Order [token required]                            |
-| GET        | /orders/myorders/show-all         | Index All My Orders [token required]                       |
-| PATCH      | /orders/submit                    | Submit My Order [token required]                           |
-| DELETE     | /orders/delete                    | Delete My Order [token required]                           |
-| GET        | /dashboard/five-most-popular      | Index Popular Products                                     |
-| GET        | /dashboard/filter/:category       | Show Products By Category                                  |
-| GET        | /dashboard/five-most-expensive    | Index Most Expensive Products                              |
-| GET        | /dashboard/users-with-orders      | Index Users With Orders [token required] [admin required]  |
-| GET        | /dashboard/products_in_orders     | Index Products in Orders [token required] [admin required] |
+| HTTP verbs | paths                              | Used for                                                   |
+| ---------- | ---------------------------------- | ---------------------------------------------------------- |
+| GET        | /users/index                       | Index [token required] [admin required]                    |
+| GET        | /users/show/:userId                | Show [token required] [admin required]                     |
+| PATCH      | /users/role                        | Change User Role [token required] [admin required]         |
+| DELETE     | /users/delete                      | Delete User [token required] [admin required]              |
+| GET        | /users/myProfile                   | Show Logged-in User Data [token required]                  |
+| POST       | /users                             | Create                                                     |
+| POST       | /users/authenticate                | Login                                                      |
+| PATCH      | /users/myProfile                   | Update Logged-in User Data [token required]                |
+| POST       | /products                          | Create [token required] [admin required]                   |
+| DELETE     | /products/:id                      | DELETE [token required] [admin required]                   |
+| GET        | /products                          | Index                                                      |
+| GET        | /products/:id                      | Show                                                       |
+| GET        | /orders                            | Index [token required] [admin required]                    |
+| GET        | /orders/pending-carts              | Index Pending Carts [token required] [admin required]      |
+| GET        | /orders/active-carts               | Index Active Carts [token required] [admin required]       |
+| GET        | /orders/show-one/:orderId/:userId  | Show [token required] [admin required]                     |
+| POST       | /orders                            | Create [token required]                                    |
+| POST       | /orders/add-to-cart                | Add Product To Cart [token required]                       |
+| PATCH      | /orders/mycart/removeProduct       | Remove Product From Cart [token required]                  |
+| GET        | /orders/mycart                     | Index Logged-in User Cart [token required]                 |
+| GET        | /orders/myorders/my-pending-order  | Show Logged-in Pending Order [token required]              |
+| GET        | /orders/myorders/show-one/:orderId | Show One Order [token required]                            |
+| GET        | /orders/myorders/show-all          | Index All My Orders [token required]                       |
+| PATCH      | /orders/submit                     | Submit My Order [token required]                           |
+| DELETE     | /orders/delete                     | Delete My Order [token required]                           |
+| GET        | /dashboard/five-most-popular       | Index Popular Products                                     |
+| GET        | /dashboard/filter/:category        | Show Products By Category                                  |
+| GET        | /dashboard/five-most-expensive     | Index Most Expensive Products                              |
+| GET        | /dashboard/users-with-orders       | Index Users With Orders [token required] [admin required]  |
+| GET        | /dashboard/products_in_orders      | Index Products in Orders [token required] [admin required] |
 
 ## Author
 
